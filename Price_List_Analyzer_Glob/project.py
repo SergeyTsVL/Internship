@@ -1,12 +1,17 @@
 import os
 import csv
 from airium import Airium
+import time
+import keyboard
+
 
 file_path = '../Price_List_Analyzer_Glob/Files_for_analysis'
 file_html = '../Price_List_Analyzer_Glob/Files_for_analysis/output.html'
 list_result = []
 search = input(f"Найти: ")
+ll = []
 class PriceMachine:
+
     def load_prices(self):
         '''
             Сканирует указанный каталог. Ищет файлы со словом price в названии.
@@ -30,6 +35,9 @@ class PriceMachine:
         files = os.listdir(file_path)
 
         for file in files:
+
+            # if key == "exit":
+            #     break
             if "price" in file:
                 with open(f'{file_path}/{file}', mode="r", encoding='utf-8') as sort_file:
                     for row in csv.reader(sort_file):
@@ -78,7 +86,22 @@ class PriceMachine:
         file = open(f"{file_html}", "a", encoding='utf-8')
         b = Airium(source_minify=True)
         y = 0
+
+
         for i in list_result:
+
+            # time.sleep(0.05)
+            if keyboard.is_pressed('e'):
+                ll.append('e')
+            if keyboard.is_pressed('x'):
+                ll.append('x')
+            if keyboard.is_pressed('i'):
+                ll.append('i')
+            if keyboard.is_pressed('t'):
+                ll.append('t')
+            if {'e', 'x', 'i', 't'} == set(ll):
+                break
+
             if search in i[0]:
                 y += 1
                 b.break_source_line()
