@@ -1,15 +1,18 @@
 import os
 import csv
+import webbrowser
+
 from airium import Airium
 import time
 import keyboard
 
 
-file_path = '../Price_List_Analyzer_Glob/Files_for_analysis'
-file_html = '../Price_List_Analyzer_Glob/Files_for_analysis/output.html'
-list_result = []
-search = input(f"Найти: ")
-ll = []
+FILE_PATH = '../Price_List_Analyzer_Glob/Files_for_analysis'
+FILE_HTML = '../Price_List_Analyzer_Glob/Files_for_analysis/output.html'
+FILE_HTML_1 = 'output.html'
+LIST_RESULT = []
+SEARCH = input(f"Найти: ")
+SAFE_WORD = []
 class PriceMachine:
 
     def load_prices(self):
@@ -32,14 +35,14 @@ class PriceMachine:
         Product_name = ['товар', 'название', 'наименование', 'продукт']
         Name_with_price = ['розница', 'цена']
         Name_with_weight = ['вес', 'масса', 'фасовка']
-        files = os.listdir(file_path)
+        files = os.listdir(FILE_PATH)
 
         for file in files:
 
             # if key == "exit":
             #     break
             if "price" in file:
-                with open(f'{file_path}/{file}', mode="r", encoding='utf-8') as sort_file:
+                with open(f'{FILE_PATH}/{file}', mode="r", encoding='utf-8') as sort_file:
                     for row in csv.reader(sort_file):
                         for i in Product_name:
                             try:
@@ -70,9 +73,9 @@ class PriceMachine:
 
                         if a not in Product_name and b not in Name_with_price and c not in Name_with_weight:
                             result = a, b, c, file
-                            list_result.append(result)
-        list_result.sort(key=lambda x: x[1])
-        return list_result
+                            LIST_RESULT.append(result)
+        LIST_RESULT.sort(key=lambda x: x[1])
+        return LIST_RESULT
 
     def find_text(self):
         '''
@@ -83,26 +86,26 @@ class PriceMachine:
         <td 3></td><td Ряпушка вял н/р></td><td 119></td><td 1></td><td price_3.csv></td>
         <td 4></td><td Килька п/п ></td><td 130></td><td 1></td><td price_0.csv></td>
         '''
-        file = open(f"{file_html}", "a", encoding='utf-8')
+        file = open(f"{FILE_HTML}", "a", encoding='utf-8')
         b = Airium(source_minify=True)
         y = 0
 
 
-        for i in list_result:
+        for i in LIST_RESULT:
 
             # time.sleep(0.05)
             if keyboard.is_pressed('e'):
-                ll.append('e')
+                SAFE_WORD.append('e')
             if keyboard.is_pressed('x'):
-                ll.append('x')
+                SAFE_WORD.append('x')
             if keyboard.is_pressed('i'):
-                ll.append('i')
+                SAFE_WORD.append('i')
             if keyboard.is_pressed('t'):
-                ll.append('t')
-            if {'e', 'x', 'i', 't'} == set(ll):
+                SAFE_WORD.append('t')
+            if {'e', 'x', 'i', 't'} <= set(SAFE_WORD):
                 break
 
-            if search in i[0]:
+            if SEARCH in i[0]:
                 y += 1
                 b.break_source_line()
                 with b.tr():
@@ -137,7 +140,7 @@ class PriceMachine:
                     <th>Цена за кг.</th>
                 </tr>
         '''
-        file = open(f"{file_html}", "w", encoding = 'utf-8')
+        file = open(f"{FILE_HTML}", "w", encoding ='utf-8')
         a = Airium()
         a('<!DOCTYPE html>')
         with ((((a.html())))):
@@ -154,8 +157,10 @@ class PriceMachine:
                 with a.tr(_t=self.find_text()):
                     pass
             file.write(str(a))
+        # webbrowser.open_new_tab(file_html)
+        webbrowser.open_new_tab(f'file://{os.getcwd()}/Files_for_analysis/{FILE_HTML_1}')
 
 if __name__ == "__main__":
-    PriceMachine.load_prices(file_path)
+    PriceMachine.load_prices(FILE_PATH)
     PriceMachine().export_to_html()
 
